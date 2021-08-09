@@ -1,0 +1,104 @@
+/**
+ * Component: Now Playing.
+ * -----------------------------------------------------------------------------
+ * Styles for the 'Now Playing' screen.
+ *
+ */
+.now-playing {
+  background-color: var(--colour-background-now-playing);
+  color: var(--color-text-primary);
+  display: flex;
+  height: 720px;
+  width: 720px;
+  top: 0;
+  left: 0;
+  opacity: 1;
+  transition: opacity 1s 1s ease-in-out;
+
+  &__cover,
+  &__details {
+    width: 720px;
+  }
+
+  &__details {
+    // background-color: var(--colour-background-now-playing);
+    color: var(--color-text-primary);
+    padding: 0 1.5em;
+  }
+
+  &__cover {
+    max-width: 720px;
+    max-height: 720px;
+    position: absolute;
+    transition: opacity 1s 1s ease-in-out;
+  }
+
+  &__image {
+    box-shadow: 1px 1px 16px -2px rgba(0, 0, 0, .3);
+    height: auto;
+    width: 720px;
+    height: auto;
+  }
+
+  &__details {
+    text-align: center;
+    z-index: 1;
+    height: fit-content;
+    transition: opacity 1s 1s ease-in-out;
+  }
+
+  &__track {
+    font-weight: var(--font-weight-heading);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  &__artists {
+    opacity: 0.8;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  &--active {
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+  }
+  &--hidden {
+    opacity: 0;
+  }
+  &--opacity-20 {
+    opacity: 0.2;
+  }
+
+  &--idle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media only screen and (min-width: 720px) {
+
+    &__details {
+      text-align: left;
+    }
+  }
+
+  .fade-enter-active{
+    transition: opacity 1s 1s ease-in-out;
+  }
+
+  .fade-leave-active {
+    transition: opacity 1s ease-in-out;
+  }
+  
+  .fade-enter-to, .fade-leave {
+    opacity: 1;
+  }
+  
+  .fade-enter, .fade-leave-to {
+    opacity: 0;
+  }
+}
