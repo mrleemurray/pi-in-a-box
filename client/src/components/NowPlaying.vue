@@ -214,7 +214,7 @@ export default {
     getEmptyPlayer() {
       document.documentElement.style.setProperty(
         '--colour-background-now-playing',
-        '#000000ß'
+        '#000000'
       )
       return {
         playing: false,
