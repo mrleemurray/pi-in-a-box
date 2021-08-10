@@ -36,8 +36,7 @@
 <script>
 import * as Vibrant from 'node-vibrant'
 var mqtt = require('mqtt')
-// var client = mqtt.connect('mqtt://test.mosquitto.org')
-var client = mqtt.connect('mqtt://192.168.0.40')
+var client = mqtt.connect(`mqtt://${process.env.VUE_APP_MQTT_BROKER_HOST_ADDRESS}`)
 
 import props from '@/utils/props.js'
 
@@ -119,43 +118,8 @@ export default {
         }
       } catch (error) {
         console.error(error)
-        // this.handleExpiredToken()
       }
     },
-
-    // async nextTrack() {
-    //   try {
-    //     console.log(this.auth.accessToken)
-    //     const response = await fetch(
-    //       `${this.endpoints.base}/${this.endpoints.nextTrack}`,
-    //       {
-    //         method: 'POST',
-    //         headers: {
-    //           Authorization: `Bearer ${this.auth.accessToken}`
-    //         }
-    //       }
-    //     )
-    //     console.log(response)
-
-    //     /**
-    //      * Fetch error.
-    //      */
-    //     if (!response.ok) {
-    //       throw new Error(`An error has occured: ${response.status}`)
-    //     }
-
-    //     /**
-    //      * Spotify returns a 204 when no current device session is found.
-    //      * The connection was successful but there's no content to return.
-    //      */
-    //     if (response.status === 204) {
-    //       return
-    //     }
-    //   } catch (error) {
-    //     console.error(error);
-    //     // this.handleExpiredToken()
-    //   }
-    // },
     /**
      * Make the network request to Spotify to
      * get the current played track.
@@ -190,6 +154,7 @@ export default {
 
           this.$nextTick(() => {
             this.$emit('spotifyTrackUpdated', data)
+            client.publish('hardware/output/lid/position', '0.0')
           })
 
           return
@@ -197,6 +162,7 @@ export default {
 
         data = await response.json()
         this.playerResponse = data
+        client.publish('hardware/output/lid/position', '1.0')
       } catch (error) {
         this.handleExpiredToken()
 
@@ -246,6 +212,10 @@ export default {
      * @return {Object}
      */
     getEmptyPlayer() {
+      document.documentElement.style.setProperty(
+        '--colour-background-now-playing',
+        '#000000ß'
+      )
       return {
         playing: false,
         trackAlbum: {},
@@ -365,9 +335,9 @@ export default {
 
     configureMQTT() {
       client.on('connect', function() {
-        client.subscribe('topic/test', function(err) {
+        client.subscribe('hardware/input/touch', function(err) {
           if (!err) {
-            client.publish('topic/test', 'Hello mqtt')
+            client.publish('status/client', 'Client connected')
           }
         })
       })
@@ -375,7 +345,7 @@ export default {
       client.on('message', function(topic, message) {
         // message is Buffer
         console.log(message.toString())
-        client.end()
+        // client.end()
       })
     }
   },

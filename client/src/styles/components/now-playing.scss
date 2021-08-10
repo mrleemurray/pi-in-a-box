@@ -21,7 +21,6 @@
   }
 
   &__details {
-    // background-color: var(--colour-background-now-playing);
     color: var(--color-text-primary);
     padding: 0 1.5em;
   }
@@ -41,7 +40,7 @@
   }
 
   &__details {
-    text-align: center;
+    text-align: left;
     z-index: 1;
     height: fit-content;
     transition: opacity 1s 1s ease-in-out;
@@ -77,13 +76,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  @media only screen and (min-width: 720px) {
-
-    &__details {
-      text-align: left;
-    }
   }
 
   .fade-enter-active{
