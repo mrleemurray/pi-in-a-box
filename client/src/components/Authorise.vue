@@ -1,11 +1,11 @@
 <template>
   <div class="authorise">
     <h1 class="authorise__heading">Pi in a box</h1>
-
+<!-- 
     <p class="authorise__copy">
       Nowify is a simple Spotify 'Now Playing' screen designed for the Raspberry
       Pi. Login with Spotify below and start playing some music!
-    </p>
+    </p> -->
 
     <button
       class="authorise__button button button--authorise"

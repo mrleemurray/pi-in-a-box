@@ -122,8 +122,8 @@ export default {
     updateHardwareState(playState) {
       if (playState !== this.previousPlayState) {
         playState ? 
-          client.publish('hardware/output/lid/position', '1.0,0.05') : 
-          client.publish('hardware/output/lid/position', '0.0,0.05')
+          client.publish('hardware/output/lid/position', '1.0,0.02') : 
+          client.publish('hardware/output/lid/position', '0.0,0.02')
       }
       this.previousPlayState = playState;
     },
