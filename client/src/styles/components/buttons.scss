@@ -27,6 +27,7 @@
   vertical-align: middle;
   white-space: nowrap;
   width: auto;
+  border-radius: 32px;
 
   &:hover {
     cursor: pointer;
@@ -35,6 +36,5 @@
   &--authorise {
     background-color: var(--color-brand-spotify);
     color: var(--color-text-primary);
-    border-radius: 50%;
   }
 }

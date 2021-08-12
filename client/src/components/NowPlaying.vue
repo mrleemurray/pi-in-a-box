@@ -5,7 +5,6 @@
       class="now-playing"
       :class="getNowPlayingClass()"
     >
-      <!-- <div class="now-playing__artwork"> -->
       <div class="now-playing__cover now-playing--opacity-20">
         <transition name="fade">
           <img
@@ -16,7 +15,6 @@
           />
         </transition>
       </div>
-      <!-- </div> -->
       <div class="now-playing__details">
         <h1 class="now-playing__track" v-text="player.trackTitle"></h1>
         <h2 class="now-playing__artists" v-text="getTrackArtists"></h2>
@@ -28,7 +26,7 @@
       </div>
     </div>
     <div v-else class="now-playing" :class="getNowPlayingClass()">
-      <h1 class="now-playing__idle-heading">No music is playing 😔</h1>
+      <h1 class="now-playing__idle-heading">No music is playing</h1>
     </div>
   </div>
 </template>
@@ -55,7 +53,8 @@ export default {
       playerResponse: {},
       playerData: this.getEmptyPlayer(),
       colourPalette: '',
-      swatches: []
+      swatches: [],
+      previousPlayState: false
     }
   },
 
@@ -120,6 +119,14 @@ export default {
         console.error(error)
       }
     },
+    updateHardwareState(playState) {
+      if (playState !== this.previousPlayState) {
+        playState ? 
+          client.publish('hardware/output/lid/position', '1.0,0.05') : 
+          client.publish('hardware/output/lid/position', '0.0,0.05')
+      }
+      this.previousPlayState = playState;
+    },
     /**
      * Make the network request to Spotify to
      * get the current played track.
@@ -151,10 +158,12 @@ export default {
         if (response.status === 204) {
           data = this.getEmptyPlayer()
           this.playerData = data
+          // console.info(this.player.playing)
+          this.updateHardwareState(this.player.playing)
 
           this.$nextTick(() => {
             this.$emit('spotifyTrackUpdated', data)
-            client.publish('hardware/output/lid/position', '0.0')
+            // client.publish('hardware/output/lid/position', '0.1,0.1')
           })
 
           return
@@ -162,7 +171,9 @@ export default {
 
         data = await response.json()
         this.playerResponse = data
-        client.publish('hardware/output/lid/position', '1.0')
+        // console.info(this.player.playing)
+        this.updateHardwareState(this.player.playing)
+        // client.publish('hardware/output/lid/position', '1.0,0.05')
       } catch (error) {
         this.handleExpiredToken()
 
