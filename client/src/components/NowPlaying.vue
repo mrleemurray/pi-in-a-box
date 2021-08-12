@@ -1,20 +1,23 @@
 <template>
   <div id="app">
+    
     <div
       v-if="player.playing"
       class="now-playing"
       :class="getNowPlayingClass()"
     >
-      <div class="now-playing__cover now-playing--opacity-20">
-        <transition name="fade">
-          <img
-            :src="player.trackAlbum.image"
-            :alt="player.trackTitle"
-            :key="player.trackTitle"
-            class="now-playing__image"
-          />
-        </transition>
-      </div>
+      <transition name="fade">
+        <div class="now-playing__cover now-playing--opacity-20">
+          <transition name="fade">
+            <img
+              :src="player.trackAlbum.image"
+              :alt="player.trackTitle"
+              :key="player.trackTitle"
+              class="now-playing__image"
+            />
+          </transition>
+        </div>
+      </transition>
       <div class="now-playing__details">
         <h1 class="now-playing__track" v-text="player.trackTitle"></h1>
         <h2 class="now-playing__artists" v-text="getTrackArtists"></h2>
@@ -26,7 +29,9 @@
       </div>
     </div>
     <div v-else class="now-playing" :class="getNowPlayingClass()">
-      <h1 class="now-playing__idle-heading">No music is playing</h1>
+      <transition name="fade">
+        <!-- <h1 class="now-playing__idle-heading">No music is playing</h1> -->
+      </transition>
     </div>
   </div>
 </template>
@@ -251,10 +256,10 @@ export default {
       //   this.colourPalette.text
       // )
       console.info(this.colourPalette.background)
-      document.documentElement.style.setProperty(
-        '--colour-background-now-playing',
-        `${this.colourPalette.background}44`
-      )
+      // document.documentElement.style.setProperty(
+      //   '--colour-background-now-playing',
+      //   `${this.colourPalette.background}44`
+      // )
     },
 
     /**
