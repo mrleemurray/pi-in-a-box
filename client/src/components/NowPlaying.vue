@@ -121,11 +121,11 @@ export default {
     },
     updateHardwareState(playState) {
       if (playState !== this.previousPlayState) {
-        playState ? 
-          client.publish('hardware/output/lid/position', '1.0,0.02') : 
-          client.publish('hardware/output/lid/position', '0.0,0.02')
+        playState
+          ? client.publish('hardware/output/lid/position', '1.0,0.02')
+          : client.publish('hardware/output/lid/position', '0.0,0.02')
       }
-      this.previousPlayState = playState;
+      this.previousPlayState = playState
     },
     /**
      * Make the network request to Spotify to
@@ -158,12 +158,10 @@ export default {
         if (response.status === 204) {
           data = this.getEmptyPlayer()
           this.playerData = data
-          // console.info(this.player.playing)
           this.updateHardwareState(this.player.playing)
 
           this.$nextTick(() => {
             this.$emit('spotifyTrackUpdated', data)
-            // client.publish('hardware/output/lid/position', '0.1,0.1')
           })
 
           return
@@ -171,9 +169,7 @@ export default {
 
         data = await response.json()
         this.playerResponse = data
-        // console.info(this.player.playing)
         this.updateHardwareState(this.player.playing)
-        // client.publish('hardware/output/lid/position', '1.0,0.05')
       } catch (error) {
         this.handleExpiredToken()
 
@@ -243,7 +239,7 @@ export default {
       clearInterval(this.pollPlaying)
       this.pollPlaying = setInterval(() => {
         this.getNowPlaying()
-      }, 2500)
+      }, 5000)
     },
 
     /**
