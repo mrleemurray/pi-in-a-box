@@ -7,7 +7,9 @@
       :class="getNowPlayingClass()"
     >
       <transition name="fade">
-        <div class="now-playing__cover now-playing--opacity-20">
+        <div class="now-playing__cover"
+             :class="getArtworkOpacity()"
+        >
           <transition name="fade">
             <img
               :src="player.trackAlbum.image"
@@ -19,13 +21,26 @@
         </div>
       </transition>
       <div class="now-playing__details">
-        <h1 class="now-playing__track" v-text="player.trackTitle"></h1>
-        <h2 class="now-playing__artists" v-text="getTrackArtists"></h2>
+        <h1
+            class="now-playing__track"
+            :class="getDetailOpacity()"
+            v-text="player.trackTitle"></h1>
+        <h2
+            class="now-playing__artists"
+            :class="getDetailOpacity()"
+            v-text="getTrackArtists"></h2>
         <!-- <div class="controls">
           <button @click="managePlayback('prev')">Prev</button>
           <button @click="managePlayback('shuffle')">Shuffle</button>
           <button @click="managePlayback('next')">Next</button>
         </div> -->
+      </div>
+      <div class="now-playing__summary">
+        <div class="scroll-left"
+                :class="getScrollTextOpacity()"      
+          >
+            <p v-text="player.trackTitle+' - ' + getTrackArtists"></p>
+          </div>
       </div>
     </div>
     <div v-else class="now-playing" :class="getNowPlayingClass()">
@@ -37,11 +52,16 @@
 </template>
 
 <script>
-import * as Vibrant from 'node-vibrant'
+// import * as Vibrant from 'node-vibrant'
 var mqtt = require('mqtt')
 var client = mqtt.connect(`mqtt://${process.env.VUE_APP_MQTT_BROKER_HOST_ADDRESS}`)
 
 import props from '@/utils/props.js'
+
+const OPEN_100_PERCENT = 0
+const OPEN_50_PERCENT = 1
+const OPEN_25_PERCENT = 2
+const OPEN_0_PERCENT = 3
 
 export default {
   name: 'NowPlaying',
@@ -59,7 +79,8 @@ export default {
       playerData: this.getEmptyPlayer(),
       colourPalette: '',
       swatches: [],
-      previousPlayState: false
+      previousPlayState: false,
+      displayState: OPEN_100_PERCENT
     }
   },
 
@@ -124,11 +145,37 @@ export default {
         console.error(error)
       }
     },
+    getArtworkOpacity() {
+      if (this.displayState === OPEN_50_PERCENT) {
+        return 'now-playing--opacity-20'
+      }
+      if (this.displayState === OPEN_25_PERCENT || this.displayState === OPEN_0_PERCENT) {
+        return 'now-playing--opacity-0'
+      }
+      return ''
+    },
+    getDetailOpacity() {
+      if (this.displayState !== OPEN_50_PERCENT) {
+        return 'now-playing--opacity-0'
+      }
+      return ''
+    },
+    getScrollTextOpacity() {
+      if (this.displayState !== OPEN_25_PERCENT) {
+        return 'now-playing--opacity-0'
+      }
+      return ''
+    },
     updateHardwareState(playState) {
       if (playState !== this.previousPlayState) {
         playState
-          ? client.publish('hardware/output/lid/position', '1.0,0.02')
-          : client.publish('hardware/output/lid/position', '0.0,0.02')
+          ? () => {
+              client.publish('hardware/output/lid/position', '1.0,0.02')
+            }
+          : () => {
+              client.publish('hardware/output/lid/position', '0.0,0.02')
+              // this.displayState = OPEN_0_PERCENT
+            }
       }
       this.previousPlayState = playState
     },
@@ -210,13 +257,13 @@ export default {
       /**
        * Run node-vibrant to get colours.
        */
-      Vibrant.from(this.player.trackAlbum.image)
-        .quality(1)
-        .clearFilters()
-        .getPalette()
-        .then(palette => {
-          this.handleAlbumPalette(palette)
-        })
+      // Vibrant.from(this.player.trackAlbum.image)
+      //   .quality(1)
+      //   .clearFilters()
+      //   .getPalette()
+      //   .then(palette => {
+      //     this.handleAlbumPalette(palette)
+      //   })
     },
 
     /**
