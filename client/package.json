@@ -13,6 +13,7 @@
     "dotenv": "^8.2.0",
     "mqtt": "^4.2.8",
     "node-vibrant": "^3.1.4",
+    "openweather-apis": "^4.4.1",
     "spotify-web-api-js": "^1.5.1",
     "vue": "^2.6.11"
   },

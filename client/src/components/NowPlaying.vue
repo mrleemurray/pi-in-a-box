@@ -46,6 +46,7 @@
     <div v-else class="now-playing" :class="getNowPlayingClass()">
       <transition name="fade">
         <!-- <h1 class="now-playing__idle-heading">No music is playing</h1> -->
+        <weather></weather>
       </transition>
     </div>
   </div>
@@ -57,6 +58,7 @@ var mqtt = require('mqtt')
 var client = mqtt.connect(`mqtt://${process.env.VUE_APP_MQTT_BROKER_HOST_ADDRESS}`)
 
 import props from '@/utils/props.js'
+import Weather from './Weather.vue'
 
 const OPEN_100_PERCENT = 0
 const OPEN_50_PERCENT = 1
@@ -65,7 +67,9 @@ const OPEN_0_PERCENT = 3
 
 export default {
   name: 'NowPlaying',
-
+  components: {
+    Weather
+  },
   props: {
     auth: props.auth,
     endpoints: props.endpoints,
