@@ -45,7 +45,6 @@
     </div>
     <div v-else class="now-playing" :class="getNowPlayingClass()">
       <transition name="fade">
-        <!-- <h1 class="now-playing__idle-heading">No music is playing</h1> -->
         <weather></weather>
       </transition>
     </div>
@@ -63,7 +62,8 @@ import Weather from './Weather.vue'
 const OPEN_100_PERCENT = 0
 const OPEN_50_PERCENT = 1
 const OPEN_25_PERCENT = 2
-const OPEN_0_PERCENT = 3
+// const OPEN_1_PERCENT = 3
+const OPEN_0_PERCENT = 4
 
 export default {
   name: 'NowPlaying',
@@ -83,7 +83,7 @@ export default {
       playerData: this.getEmptyPlayer(),
       colourPalette: '',
       swatches: [],
-      previousPlayState: false,
+      previousPlayState: null,
       displayState: OPEN_100_PERCENT
     }
   },
@@ -172,14 +172,8 @@ export default {
     },
     updateHardwareState(playState) {
       if (playState !== this.previousPlayState) {
-        playState
-          ? () => {
-              client.publish('hardware/output/lid/position', '1.0,0.02')
-            }
-          : () => {
-              client.publish('hardware/output/lid/position', '0.0,0.02')
-              // this.displayState = OPEN_0_PERCENT
-            }
+        var newLidPosition = playState ? '1.0,0.02' : '0.0,0.02';
+        client.publish('hardware/output/lid/position', newLidPosition)
       }
       this.previousPlayState = playState
     },
@@ -214,21 +208,19 @@ export default {
         if (response.status === 204) {
           data = this.getEmptyPlayer()
           this.playerData = data
-          this.updateHardwareState(this.player.playing)
+          // this.updateHardwareState(this.playerData.playing)
 
           this.$nextTick(() => {
             this.$emit('spotifyTrackUpdated', data)
           })
-
           return
         }
 
         data = await response.json()
         this.playerResponse = data
-        this.updateHardwareState(this.player.playing)
+        // this.updateHardwareState(this.playerData.playing)
       } catch (error) {
         this.handleExpiredToken()
-
         data = this.getEmptyPlayer()
         this.playerData = data
 
@@ -245,29 +237,6 @@ export default {
     getNowPlayingClass() {
       const playerClass = this.player.playing ? 'active' : 'idle'
       return `now-playing--${playerClass}`
-    },
-
-    /**
-     * Get the colour palette from the album cover.
-     */
-    getAlbumColours() {
-      /**
-       * No image (rare).
-       */
-      if (!this.player.trackAlbum?.image) {
-        return
-      }
-
-      /**
-       * Run node-vibrant to get colours.
-       */
-      // Vibrant.from(this.player.trackAlbum.image)
-      //   .quality(1)
-      //   .clearFilters()
-      //   .getPalette()
-      //   .then(palette => {
-      //     this.handleAlbumPalette(palette)
-      //   })
     },
 
     /**
@@ -296,21 +265,6 @@ export default {
       this.pollPlaying = setInterval(() => {
         this.getNowPlaying()
       }, 5000)
-    },
-
-    /**
-     * Set the stylings of the app based on received colours.
-     */
-    setAppColours() {
-      // document.documentElement.style.setProperty(
-      //   '--color-text-primary',
-      //   this.colourPalette.text
-      // )
-      console.info(this.colourPalette.background)
-      // document.documentElement.style.setProperty(
-      //   '--colour-background-now-playing',
-      //   `${this.colourPalette.background}44`
-      // )
     },
 
     /**
@@ -408,7 +362,6 @@ export default {
       client.on('message', function(topic, message) {
         // message is Buffer
         console.log(message.toString())
-        // client.end()
       })
     }
   },
@@ -434,10 +387,7 @@ export default {
      */
     playerData: function() {
       this.$emit('spotifyTrackUpdated', this.playerData)
-
-      this.$nextTick(() => {
-        this.getAlbumColours()
-      })
+      this.updateHardwareState(this.playerData.playing)
     }
   }
 }
