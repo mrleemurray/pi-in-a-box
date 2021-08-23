@@ -59,11 +59,19 @@ var client = mqtt.connect(`mqtt://${process.env.VUE_APP_MQTT_BROKER_HOST_ADDRESS
 import props from '@/utils/props.js'
 import Weather from './Weather.vue'
 
-const OPEN_100_PERCENT = 0
-const OPEN_50_PERCENT = 1
-const OPEN_25_PERCENT = 2
-// const OPEN_1_PERCENT = 3
-const OPEN_0_PERCENT = 4
+const OPEN_100_PERCENT = 1.0
+const OPEN_50_PERCENT = 0.5
+const OPEN_25_PERCENT = 0.2
+// const OPEN_1_PERCENT = 0.01
+const OPEN_0_PERCENT = 0
+
+// const FAST_SPEED = 0.05;
+// const MEDIUM_SPEED = 0.03;
+// const SLOW_SPEED = 0.02;
+
+const LID_POSITION_CHANNEL = 'hardware/output/lid/position';
+const CONTENT_SCHEDULE_CHANNEL = 'content/schedule';
+const TOUCH_INPUT_CHANNEL = 'hardware/input/touch';
 
 export default {
   name: 'NowPlaying',
@@ -173,7 +181,7 @@ export default {
     updateHardwareState(playState) {
       if (playState !== this.previousPlayState) {
         var newLidPosition = playState ? '1.0,0.02' : '0.0,0.02';
-        client.publish('hardware/output/lid/position', newLidPosition)
+        client.publish(LID_POSITION_CHANNEL, newLidPosition)
       }
       this.previousPlayState = playState
     },
@@ -352,7 +360,12 @@ export default {
 
     configureMQTT() {
       client.on('connect', function() {
-        client.subscribe('hardware/input/touch', function(err) {
+        client.subscribe(TOUCH_INPUT_CHANNEL, function(err) {
+          if (!err) {
+            client.publish('status/client', 'Client connected')
+          }
+        })
+        client.subscribe(CONTENT_SCHEDULE_CHANNEL, function(err) {
           if (!err) {
             client.publish('status/client', 'Client connected')
           }

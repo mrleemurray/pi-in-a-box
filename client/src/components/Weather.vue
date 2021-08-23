@@ -18,38 +18,55 @@ export default {
 
   data() {
     return {
- 
+      pollWeather: null,
+      weather: null
     }
   },
 
   computed: {},
 
   created() {
-      // set city by name
-    weather.setLang('en');
-	weather.setCity('Walthamstow')
-    weather.setUnits('metric')
-    weather.setAPPID(process.env.VUE_APP_OPENWEATHER_APP_ID)
+
   },
 
   mounted() {
-      // get the Temperature  
-	weather.getTemperature(function(err, temp){
-		console.log(temp);
-	});
-    weather.getSmartJSON(function(err, desc){
-		console.log(desc);
-	});
-    weather.getAllWeather(function(err, JSONObj){
-		console.log(JSONObj);
-	});
-    // weather.getWeatherForecastForDays(3, function(err, obj){
-	// 	console.log(obj);
-	// });
+    this.configureWeather('metric');
+    this.setDataInterval()
+  },
+
+  beforeDestroy() {
+    clearInterval(this.pollWeather)
   },
 
   methods: {
+      /**
+     * Poll OpenWeather for data.
+     */
+    setDataInterval() {
+      clearInterval(this.pollWeather)
+      this.pollWeather = setInterval(() => {
+        this.getNowPlaying()
+      }, (60 * 15 * 1000))
+    },
 
+    configureWeather(units) {
+        weather.setLang('en');
+        weather.setCity('Walthamstow')
+        weather.setUnits(units)
+        weather.setAPPID(process.env.VUE_APP_OPENWEATHER_APP_ID)
+    },
+    getLatestWeather() {
+        weather.getTemperature(function(err, temp){
+            console.log(temp);
+        });
+        weather.getSmartJSON(function(err, desc){
+            console.log(desc);
+        });
+        weather.getAllWeather(function(err, JSONObj){
+            console.log(JSONObj);
+            this.weather = JSONObj;
+        });
+    }
   },
 
   watch: {
