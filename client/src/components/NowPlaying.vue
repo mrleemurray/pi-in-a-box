@@ -60,7 +60,9 @@ import props from '@/utils/props.js'
 import Weather from './Weather.vue'
 
 const OPEN_100_PERCENT = 1.0
+// const OPEN_66_PERCENT = 0.66
 const OPEN_50_PERCENT = 0.5
+// const OPEN_33_PERCENT = 0.33
 const OPEN_25_PERCENT = 0.2
 // const OPEN_1_PERCENT = 0.01
 const OPEN_0_PERCENT = 0
@@ -92,7 +94,8 @@ export default {
       colourPalette: '',
       swatches: [],
       previousPlayState: null,
-      displayState: OPEN_100_PERCENT
+      displayState: OPEN_0_PERCENT,
+      lastDisplayState: OPEN_0_PERCENT
     }
   },
 
@@ -400,7 +403,7 @@ export default {
      */
     playerData: function() {
       this.$emit('spotifyTrackUpdated', this.playerData)
-      this.updateHardwareState(this.playerData.playing)
+      // this.updateHardwareState(this.playerData.playing)
     }
   }
 }
