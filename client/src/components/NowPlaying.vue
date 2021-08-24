@@ -1,15 +1,12 @@
 <template>
   <div id="app">
-    
     <div
       v-if="player.playing"
       class="now-playing"
       :class="getNowPlayingClass()"
     >
       <transition name="fade">
-        <div class="now-playing__cover"
-             :class="getArtworkOpacity()"
-        >
+        <div class="now-playing__cover" :class="getArtworkOpacity()">
           <transition name="fade">
             <img
               :src="player.trackAlbum.image"
@@ -22,13 +19,15 @@
       </transition>
       <div class="now-playing__details">
         <h1
-            class="now-playing__track"
-            :class="getDetailOpacity()"
-            v-text="player.trackTitle"></h1>
+          class="now-playing__track"
+          :class="getDetailOpacity()"
+          v-text="player.trackTitle"
+        />
         <h2
-            class="now-playing__artists"
-            :class="getDetailOpacity()"
-            v-text="getTrackArtists"></h2>
+          class="now-playing__artists"
+          :class="getDetailOpacity()"
+          v-text="getTrackArtists"
+        />
         <!-- <div class="controls">
           <button @click="managePlayback('prev')">Prev</button>
           <button @click="managePlayback('shuffle')">Shuffle</button>
@@ -36,11 +35,9 @@
         </div> -->
       </div>
       <div class="now-playing__summary">
-        <div class="scroll-left"
-                :class="getScrollTextOpacity()"      
-          >
-            <p v-text="player.trackTitle+' - ' + getTrackArtists"></p>
-          </div>
+        <div class="scroll-left" :class="getScrollTextOpacity()">
+          <p v-text="player.trackTitle + ' - ' + getTrackArtists" />
+        </div>
       </div>
     </div>
     <div v-else class="now-playing" :class="getNowPlayingClass()">
@@ -52,14 +49,15 @@
 </template>
 
 <script>
-// import * as Vibrant from 'node-vibrant'
 var mqtt = require('mqtt')
-var client = mqtt.connect(`mqtt://${process.env.VUE_APP_MQTT_BROKER_HOST_ADDRESS}`)
+var client = mqtt.connect(
+  `mqtt://${process.env.VUE_APP_MQTT_BROKER_HOST_ADDRESS}`
+)
 
 import props from '@/utils/props.js'
 import Weather from './Weather.vue'
 
-const OPEN_100_PERCENT = 1.0
+// const OPEN_100_PERCENT = 1.0
 // const OPEN_66_PERCENT = 0.66
 const OPEN_50_PERCENT = 0.5
 // const OPEN_33_PERCENT = 0.33
@@ -71,9 +69,9 @@ const OPEN_0_PERCENT = 0
 // const MEDIUM_SPEED = 0.03;
 // const SLOW_SPEED = 0.02;
 
-const LID_POSITION_CHANNEL = 'hardware/output/lid/position';
-const CONTENT_SCHEDULE_CHANNEL = 'content/schedule';
-const TOUCH_INPUT_CHANNEL = 'hardware/input/touch';
+const LID_POSITION_CHANNEL = 'hardware/output/lid/position'
+const CONTENT_SCHEDULE_CHANNEL = 'content/schedule'
+const TOUCH_INPUT_CHANNEL = 'hardware/input/touch'
 
 export default {
   name: 'NowPlaying',
@@ -145,7 +143,6 @@ export default {
         if (!response.ok) {
           throw new Error(`An error has occured: ${response.status}`)
         }
-
         /**
          * Spotify returns a 204 when no current device session is found.
          * The connection was successful but there's no content to return.
@@ -164,7 +161,10 @@ export default {
       if (this.displayState === OPEN_50_PERCENT) {
         return 'now-playing--opacity-20'
       }
-      if (this.displayState === OPEN_25_PERCENT || this.displayState === OPEN_0_PERCENT) {
+      if (
+        this.displayState === OPEN_25_PERCENT ||
+        this.displayState === OPEN_0_PERCENT
+      ) {
         return 'now-playing--opacity-0'
       }
       return ''
@@ -183,7 +183,7 @@ export default {
     },
     updateHardwareState(playState) {
       if (playState !== this.previousPlayState) {
-        var newLidPosition = playState ? '1.0,0.02' : '0.0,0.02';
+        var newLidPosition = playState ? '1.0,0.02' : '0.0,0.02'
         client.publish(LID_POSITION_CHANNEL, newLidPosition)
       }
       this.previousPlayState = playState
@@ -194,7 +194,6 @@ export default {
      */
     async getNowPlaying() {
       let data = {}
-
       try {
         const response = await fetch(
           `${this.endpoints.base}/${this.endpoints.nowPlaying}`,
@@ -255,10 +254,10 @@ export default {
      * @return {Object}
      */
     getEmptyPlayer() {
-      document.documentElement.style.setProperty(
-        '--colour-background-now-playing',
-        '#000000'
-      )
+      // document.documentElement.style.setProperty(
+      //   '--colour-background-now-playing',
+      //   '#000000'
+      // )
       return {
         playing: false,
         trackAlbum: {},
@@ -288,7 +287,6 @@ export default {
       ) {
         window.console.log('throw error')
         this.handleExpiredToken()
-
         return
       }
 
@@ -297,7 +295,6 @@ export default {
        */
       if (this.playerResponse.is_playing === false) {
         this.playerData = this.getEmptyPlayer()
-
         return
       }
 

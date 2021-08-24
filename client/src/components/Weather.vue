@@ -1,21 +1,15 @@
 <template>
-  <div>
-    
-  </div>
+  <div></div>
 </template>
 
 <script>
-
 var weather = require('openweather-apis')
 
 export default {
   name: 'Weather',
 
-  components: {
-  },
-
+  components: {},
   props: {},
-
   data() {
     return {
       pollWeather: null,
@@ -25,12 +19,10 @@ export default {
 
   computed: {},
 
-  created() {
-
-  },
+  created() {},
 
   mounted() {
-    this.configureWeather('metric');
+    this.configureWeather('metric')
     this.setDataInterval()
   },
 
@@ -39,37 +31,36 @@ export default {
   },
 
   methods: {
-      /**
+    /**
      * Poll OpenWeather for data.
      */
     setDataInterval() {
       clearInterval(this.pollWeather)
       this.pollWeather = setInterval(() => {
         this.getNowPlaying()
-      }, (60 * 15 * 1000))
+      }, 60 * 15 * 1000)
     },
 
     configureWeather(units) {
-        weather.setLang('en');
-        weather.setCity('Walthamstow')
-        weather.setUnits(units)
-        weather.setAPPID(process.env.VUE_APP_OPENWEATHER_APP_ID)
+      weather.setLang('en')
+      weather.setCity('Walthamstow')
+      weather.setUnits(units)
+      weather.setAPPID(process.env.VUE_APP_OPENWEATHER_APP_ID)
     },
     getLatestWeather() {
-        weather.getTemperature(function(err, temp){
-            console.log(temp);
-        });
-        weather.getSmartJSON(function(err, desc){
-            console.log(desc);
-        });
-        weather.getAllWeather(function(err, JSONObj){
-            console.log(JSONObj);
-            this.weather = JSONObj;
-        });
+      weather.getTemperature(function(err, temp) {
+        console.log(temp)
+      })
+      weather.getSmartJSON(function(err, desc) {
+        console.log(desc)
+      })
+      weather.getAllWeather(function(err, JSONObj) {
+        console.log(JSONObj)
+        this.weather = JSONObj
+      })
     }
   },
 
-  watch: {
-  }
+  watch: {}
 }
 </script>

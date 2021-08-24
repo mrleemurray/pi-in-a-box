@@ -2,8 +2,6 @@ import paho.mqtt.client as mqtt
 import time
 import datetime
 import threading
-# now = datetime.datetime.now()
-
 class ScheduleItem:
     hour = None
     minute = None
