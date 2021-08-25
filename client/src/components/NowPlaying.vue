@@ -254,10 +254,6 @@ export default {
      * @return {Object}
      */
     getEmptyPlayer() {
-      // document.documentElement.style.setProperty(
-      //   '--colour-background-now-playing',
-      //   '#000000'
-      // )
       return {
         playing: false,
         trackAlbum: {},
