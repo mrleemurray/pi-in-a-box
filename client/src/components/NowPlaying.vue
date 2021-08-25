@@ -57,7 +57,7 @@ var client = mqtt.connect(
 import props from '@/utils/props.js'
 import Weather from './Weather.vue'
 
-// const OPEN_100_PERCENT = 1.0
+const OPEN_100_PERCENT = 1.0
 // const OPEN_66_PERCENT = 0.66
 const OPEN_50_PERCENT = 0.5
 // const OPEN_33_PERCENT = 0.33
@@ -66,12 +66,16 @@ const OPEN_25_PERCENT = 0.2
 const OPEN_0_PERCENT = 0
 
 // const FAST_SPEED = 0.05;
-// const MEDIUM_SPEED = 0.03;
-// const SLOW_SPEED = 0.02;
+const MEDIUM_SPEED = 0.03;
+const SLOW_SPEED = 0.02;
+
+const SCHEDULE = 'SCHEDULE'
+const TAP = 'TAP'
+const LONG_PRESS = 'LONG_PRESS'
 
 const LID_POSITION_CHANNEL = 'hardware/output/lid/position'
-const CONTENT_SCHEDULE_CHANNEL = 'content/schedule'
 const TOUCH_INPUT_CHANNEL = 'hardware/input/touch'
+const SCHEDULE_INPUT_CHANNEL = 'schedule/lid/position'
 
 export default {
   name: 'NowPlaying',
@@ -92,8 +96,9 @@ export default {
       colourPalette: '',
       swatches: [],
       previousPlayState: null,
-      displayState: OPEN_0_PERCENT,
-      lastDisplayState: OPEN_0_PERCENT
+      currentLidPosition: OPEN_0_PERCENT,
+      previousLidPosition: OPEN_0_PERCENT,
+      lastInputType: SCHEDULE
     }
   },
 
@@ -358,11 +363,13 @@ export default {
       client.on('connect', function() {
         client.subscribe(TOUCH_INPUT_CHANNEL, function(err) {
           if (!err) {
+            console.info(`connected to ${TOUCH_INPUT_CHANNEL}`)
             client.publish('status/client', 'Client connected')
           }
         })
-        client.subscribe(CONTENT_SCHEDULE_CHANNEL, function(err) {
+        client.subscribe(SCHEDULE_INPUT_CHANNEL, function(err) {
           if (!err) {
+            console.info(`connected to ${SCHEDULE_INPUT_CHANNEL}`)
             client.publish('status/client', 'Client connected')
           }
         })
@@ -370,9 +377,72 @@ export default {
 
       client.on('message', function(topic, message) {
         // message is Buffer
+        // tap toggles between scheduled position and 100%
+        // long press toggles scheduled position and 0%
         console.log(message.toString())
+        // handleInput(topic, message)
+        if (topic == SCHEDULE_INPUT_CHANNEL) {
+          if (this.lastInputType !== LONG_PRESS) {
+            this.previousLidPosition = this.currentLidPosition
+          }
+          this.currentLidPosition = message
+          client.publish(LID_POSITION_CHANNEL, `${this.currentLidPosition},${SLOW_SPEED}`)
+          this.lastInputType = SCHEDULE
+        }
+        if (topic == TOUCH_INPUT_CHANNEL) {
+          if (message.toString() === TAP) {
+            if (this.currentLidPosition === OPEN_100_PERCENT) {
+              this.currentLidPosition = this.previousLidPosition
+            } else {
+              if (this.lastInputType !== LONG_PRESS) {
+                this.previousLidPosition = this.currentLidPosition
+              }
+              this.currentLidPosition = OPEN_100_PERCENT
+            }
+            client.publish(LID_POSITION_CHANNEL, `${this.currentLidPosition},${MEDIUM_SPEED}`)
+            this.lastInputType = TAP
+          }
+          if (message.toString() === LONG_PRESS) {
+            if (this.lastInputType !== LONG_PRESS) {
+              this.currentLidPosition = OPEN_0_PERCENT
+              client.publish(LID_POSITION_CHANNEL, `${this.currentLidPosition},${SLOW_SPEED}`)
+              this.lastInputType = LONG_PRESS
+            }
+          }
+        }
       })
-    }
+    },
+    // handleInput(topic, message) {
+      // if (topic == SCHEDULE_INPUT_CHANNEL) {
+      //   if (this.lastInputType !== LONG_PRESS) {
+      //     this.previousLidPosition = this.currentLidPosition
+      //   }
+      //   this.currentLidPosition = message
+      //   client.publish(LID_POSITION_CHANNEL, `${this.currentLidPosition},${MEDIUM_SPEED}`)
+      //   this.lastInputType = SCHEDULE
+      // }
+      // if (topic == TOUCH_INPUT_CHANNEL) {
+      //   if (message === TAP) {
+      //     if (this.currentLidPosition === OPEN_100_PERCENT) {
+      //       this.currentLidPosition = this.previousLidPosition
+      //     } else {
+      //       if (this.lastInputType !== LONG_PRESS) {
+      //         this.previousLidPosition = this.currentLidPosition
+      //       }
+      //       this.currentLidPosition = OPEN_100_PERCENT
+      //     }
+      //     client.publish(LID_POSITION_CHANNEL, `${this.currentLidPosition},${FAST_SPEED}`)
+      //     this.lastInputType = TAP
+      //   }
+      //   if (message === LONG_PRESS) {
+      //     if (this.lastInputType !== LONG_PRESS) {
+      //       this.currentLidPosition = OPEN_0_PERCENT
+      //       client.publish(LID_POSITION_CHANNEL, `${this.currentLidPosition},${SLOW_SPEED}`)
+      //       this.lastInputType = LONG_PRESS
+      //     }
+      //   }
+      // }
+    // }
   },
   watch: {
     /**
