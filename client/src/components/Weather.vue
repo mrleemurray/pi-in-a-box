@@ -15,7 +15,8 @@ export default {
       pollWeather: null,
       weather: {
           metric: {},
-          imperial: {}
+          imperial: {},
+          image: null
       }
     }
   },
@@ -56,6 +57,8 @@ export default {
       weather.setUnits('metric')
       weather.getAllWeather((err, JSONObj) => {
         self.weather.metric = JSONObj
+        self.weather.image = `https://source.unsplash.com/720x720/?${self.weather.metric.weather[0].description.replace(/ /g, ",")}`
+        console.info(self.weather.image)
       })
       weather.setUnits('imperial')
       weather.getAllWeather((err, JSONObj) => {
