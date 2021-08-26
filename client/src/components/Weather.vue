@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div v-text="weather.metric.weather[0].description"></div>
 </template>
 
 <script>
@@ -13,7 +13,10 @@ export default {
   data() {
     return {
       pollWeather: null,
-      weather: null
+      weather: {
+          metric: {},
+          imperial: {}
+      }
     }
   },
 
@@ -23,6 +26,7 @@ export default {
 
   mounted() {
     this.configureWeather('metric')
+    this.getLatestWeather()
     this.setDataInterval()
   },
 
@@ -37,7 +41,7 @@ export default {
     setDataInterval() {
       clearInterval(this.pollWeather)
       this.pollWeather = setInterval(() => {
-        this.getNowPlaying()
+        this.getLatestWeather()
       }, 60 * 15 * 1000)
     },
 
@@ -48,16 +52,16 @@ export default {
       weather.setAPPID(process.env.VUE_APP_OPENWEATHER_APP_ID)
     },
     getLatestWeather() {
-      weather.getTemperature(function(err, temp) {
-        console.log(temp)
+      var self = this;
+      weather.setUnits('metric')
+      weather.getAllWeather((err, JSONObj) => {
+        self.weather.metric = JSONObj
       })
-      weather.getSmartJSON(function(err, desc) {
-        console.log(desc)
+      weather.setUnits('imperial')
+      weather.getAllWeather((err, JSONObj) => {
+        self.weather.imperial = JSONObj
       })
-      weather.getAllWeather(function(err, JSONObj) {
-        console.log(JSONObj)
-        this.weather = JSONObj
-      })
+      console.info(this.weather)
     }
   },
 
