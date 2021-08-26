@@ -1,5 +1,27 @@
 <template>
-  <div v-text="weather.metric.weather[0].description"></div>
+  <div v-if="(weather.metric !== null) && (weather.imperial !== null)" class="weather">
+      <div class="weather__cover">
+            <transition name="fade">
+                <img
+                :src="weather.image"
+                :alt="weather.metric.weather[0].description"
+                :key="weather.dt"
+                class="weather__image"
+                />
+                
+            </transition>
+        </div>
+        <div class="weather__details">
+            <h1
+                class="weather__temperature"
+                v-text="temperature()"
+            />
+            <h2
+                class="weather__humidity"
+                v-text="weather.metric.main.humidity"
+            />
+        </div>
+  </div>
 </template>
 
 <script>
@@ -14,14 +36,16 @@ export default {
     return {
       pollWeather: null,
       weather: {
-          metric: {},
-          imperial: {},
+          metric: null,
+          imperial: null,
           image: null
       }
     }
   },
 
-  computed: {},
+  computed: {
+      
+  },
 
   created() {},
 
@@ -58,16 +82,20 @@ export default {
       weather.getAllWeather((err, JSONObj) => {
         self.weather.metric = JSONObj
         self.weather.image = `https://source.unsplash.com/720x720/?${self.weather.metric.weather[0].description.replace(/ /g, ",")}`
-        console.info(self.weather.image)
       })
       weather.setUnits('imperial')
       weather.getAllWeather((err, JSONObj) => {
         self.weather.imperial = JSONObj
       })
       console.info(this.weather)
-    }
+    },
+    temperature(){
+        return `${Math.round(this.weather.metric.main.temp)}°C / ${Math.round(this.weather.imperial.main.temp)}°F`
+      }
   },
 
   watch: {}
 }
 </script>
+
+<style src="@/styles/components/weather.scss" lang="scss" scoped></style>

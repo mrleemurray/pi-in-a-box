@@ -1,0 +1,151 @@
+/**
+ * Component: Now Playing.
+ * -----------------------------------------------------------------------------
+ * Styles for the 'Now Playing' screen.
+ *
+ */
+.weather {
+  color: var(--color-text-primary);
+  display: flex;
+  height: 720px;
+  width: 720px;
+  top: 0;
+  left: 0;
+  opacity: 1;
+  transition: opacity 1s 1s ease-in-out;
+
+  &__cover,
+  &__details {
+    width: 720px;
+  }
+
+  &__details {
+    color: var(--color-text-primary);
+    padding: 0 1.5em;
+  }
+
+  &__cover {
+    max-width: 720px;
+    max-height: 720px;
+    position: absolute;
+    transition: opacity 1s 1s ease-in-out;
+  }
+
+  &__image {
+    height: auto;
+    width: 720px;
+    height: auto;
+  }
+
+  &__details {
+    text-align: left;
+    z-index: 1;
+    height: fit-content;
+    opacity: 1;
+    transition: opacity 1s 1s ease-in-out;
+  }
+
+  &__temperature {
+    font-weight: var(--font-weight-heading);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    opacity: 1;
+    transition: opacity 1s 1s ease-in-out;
+  }
+
+  &__humidity {
+    opacity: 0.8;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    opacity: 1;
+    transition: opacity 1s 1s ease-in-out;
+  }
+
+  &--active {
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+  }
+  &--opacity-20 {
+    opacity: 0.2;
+  }
+  &--opacity-0 {
+    opacity: 0;
+  }
+
+  &--idle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__summary {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 1;
+    transition: opacity 1s 1s ease-in-out;
+  }
+
+  .fade-enter-active{
+    transition: opacity 1s 1s ease-in-out;
+  }
+
+  .fade-leave-active {
+    transition: opacity 1s ease-in-out;
+  }
+  
+  .fade-enter-to, .fade-leave {
+    opacity: 1;
+  }
+  
+  .fade-enter, .fade-leave-to {
+    opacity: 0;
+  }
+
+  .scroll-left {
+    height: 50px; 
+    overflow: hidden;
+    position: relative;
+    }
+    .scroll-left p {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    line-height: 50px;
+    text-align: center;
+    /* Starting position */
+    -moz-transform:translateX(100%);
+    -webkit-transform:translateX(100%); 
+    transform:translateX(100%);
+    /* Apply animation to this element */ 
+    -moz-animation: scroll-left 30s linear infinite;
+    -webkit-animation: scroll-left 30s linear infinite;
+    animation: scroll-left 30s linear infinite;
+    }
+    /* Move it (define the animation) */
+    @-moz-keyframes scroll-left {
+    0% { -moz-transform: translateX(100%); }
+    100% { -moz-transform: translateX(-100%); }
+    }
+    @-webkit-keyframes scroll-left {
+    0% { -webkit-transform: translateX(100%); }
+    100% { -webkit-transform: translateX(-100%); }
+    }
+    @keyframes scroll-left {
+    0% { 
+    -moz-transform: translateX(100%); /* Browser bug fix */
+    -webkit-transform: translateX(100%); /* Browser bug fix */
+    transform: translateX(100%); 
+    }
+    100% { 
+    -moz-transform: translateX(-100%); /* Browser bug fix */
+    -webkit-transform: translateX(-100%); /* Browser bug fix */
+    transform: translateX(-100%); 
+    }
+    }
+}
