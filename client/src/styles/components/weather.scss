@@ -35,6 +35,7 @@
     height: auto;
     width: 720px;
     height: auto;
+    opacity: 0.5;
   }
 
   &__details {
@@ -42,24 +43,56 @@
     z-index: 1;
     height: fit-content;
     opacity: 1;
+    padding-top: 1em;
     transition: opacity 1s 1s ease-in-out;
   }
 
   &__temperature {
+    font-size: 8em;
     font-weight: var(--font-weight-heading);
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     opacity: 1;
+    margin: 0em 0em 0.2em 0em;
     transition: opacity 1s 1s ease-in-out;
   }
 
-  &__humidity {
+  &__divider {
+    opacity: 0.5;
+    margin: 0em 0.25em;
+  }
+
+  &__feel {
+    font-size: 5em;
+  }
+
+  &__description {
+    font-weight: lighter;
     opacity: 0.8;
+    font-size: 2.5em;
+    margin: 0;
+  }
+
+  &__smaller {
+    font-size: 2em;
+    margin-top: 4em;
+  }
+
+  &__extra {
+    display: flex;
+  }
+
+  &__section {
+    width: 33.333%;
+  }
+
+  &__humidity {
+    font-size: 4em;
+    margin: 0;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    opacity: 1;
     transition: opacity 1s 1s ease-in-out;
   }
 
