@@ -84,7 +84,6 @@ export default {
   },
 
   computed: {
-      
   },
 
   created() {},
@@ -114,6 +113,7 @@ export default {
       weather.setLang('en')
       weather.setCity('Walthamstow')
       weather.setUnits(units)
+      weather.setCoordinate(51.5886338, -0.0353019);
       weather.setAPPID(process.env.VUE_APP_OPENWEATHER_APP_ID)
     },
     getLatestWeather() {
@@ -126,7 +126,12 @@ export default {
       weather.setUnits(IMPERIAL)
       weather.getAllWeather((err, JSONObj) => {
         self.weather.imperial = JSONObj
+        self.updateTemperatureColor(self.weather.imperial.main.temp)
       })
+      weather.getWeatherOneCall((err, data) => {
+            console.info('?')
+            console.info(data)
+        });
       console.info(this.weather)
     },
     temperature(){
@@ -169,6 +174,13 @@ export default {
             return 'weather--opacity-0'
         }
         return ''
+    },
+    updateTemperatureColor(temperature) {
+        var hue = 200 + (160 * ( temperature / 100 ));
+        document.documentElement.style.setProperty(
+        '--colour-temperature',
+        `hsl(${hue}, 50%, 50%)`
+      )
     }
   },
 

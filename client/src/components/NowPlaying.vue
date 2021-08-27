@@ -412,37 +412,6 @@ export default {
         }
       })
     },
-    // handleInput(topic, message) {
-      // if (topic == SCHEDULE_INPUT_CHANNEL) {
-      //   if (this.lastInputType !== LONG_PRESS) {
-      //     this.previousLidPosition = this.currentLidPosition
-      //   }
-      //   this.currentLidPosition = message
-      //   client.publish(LID_POSITION_CHANNEL, `${this.currentLidPosition},${MEDIUM_SPEED}`)
-      //   this.lastInputType = SCHEDULE
-      // }
-      // if (topic == TOUCH_INPUT_CHANNEL) {
-      //   if (message === TAP) {
-      //     if (this.currentLidPosition === OPEN_100_PERCENT) {
-      //       this.currentLidPosition = this.previousLidPosition
-      //     } else {
-      //       if (this.lastInputType !== LONG_PRESS) {
-      //         this.previousLidPosition = this.currentLidPosition
-      //       }
-      //       this.currentLidPosition = OPEN_100_PERCENT
-      //     }
-      //     client.publish(LID_POSITION_CHANNEL, `${this.currentLidPosition},${FAST_SPEED}`)
-      //     this.lastInputType = TAP
-      //   }
-      //   if (message === LONG_PRESS) {
-      //     if (this.lastInputType !== LONG_PRESS) {
-      //       this.currentLidPosition = OPEN_0_PERCENT
-      //       client.publish(LID_POSITION_CHANNEL, `${this.currentLidPosition},${SLOW_SPEED}`)
-      //       this.lastInputType = LONG_PRESS
-      //     }
-      //   }
-      // }
-    // }
   },
   watch: {
     /**
