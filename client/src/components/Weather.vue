@@ -7,10 +7,11 @@
                 :alt="weather.metric.weather[0].description"
                 :key="weather.dt"
                 class="weather__image"
+                :class="imageOpacity(size)"
                 />
             </transition>
         </div>
-        <div class="weather__details">
+        <div class="weather__details" :class="largeDetailOpacity(size)">
             <p
                 class="weather__temperature"
             >
@@ -65,7 +66,12 @@ export default {
   name: 'Weather',
 
   components: {},
-  props: {},
+  props: {
+      size: {
+          type: Number,
+          default: 0.8
+      }
+  },
   data() {
     return {
       pollWeather: null,
@@ -142,6 +148,24 @@ export default {
     },
     isTempFeelDifferent(temperature){
         if (Math.round(temperature.temp) == Math.round(temperature.feels_like)){
+            return 'weather--opacity-0'
+        }
+        return ''
+    },
+    imageOpacity(size) {
+        if (size >= 0.8) {
+            return 'weather--opacity-50'
+        }
+        if (size >= 0.5) {
+            return 'weather--opacity-30'
+        }
+        if (size >= 0.2) {
+            return 'weather--opacity-10'
+        }
+        return 'weather--opacity-0'
+    },
+    largeDetailOpacity(size) {
+        if (size < 0.8) {
             return 'weather--opacity-0'
         }
         return ''
