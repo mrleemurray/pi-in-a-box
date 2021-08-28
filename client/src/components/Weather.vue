@@ -13,13 +13,18 @@
         </div>
         <div class="weather__details" :class="largeDetailOpacity(size)">
             <p
+                class="weather__overview"
+            >
+                <span v-text="formatOverview(weather)"/>
+            </p>
+            <p
                 class="weather__temperature"
             >
                 <span v-text="formatTemperature(weather.imperial.main.temp, 'imperial')"/>
                 <span class="weather__divider">/</span>
                 <span v-text="formatTemperature(weather.metric.main.temp, 'metric')"/>
             </p>
-            <div :class="isTempFeelDifferent(weather.imperial.main)">
+            <!-- <div :class="isTempFeelDifferent(weather.imperial.main)">
             <p class="weather__description">Feels like</p>
             <p
                 class="weather__temperature weather__feel"
@@ -28,8 +33,8 @@
                 <span class="weather__divider">/</span>
                 <span v-text="formatTemperature(weather.metric.main.feels_like, 'metric')"/>
             </p>
-            </div>
-            <div class="weather__extra">
+            </div> -->
+            <!-- <div class="weather__extra">
                 <div class="weather__section">
                 <p class="weather__description weather__smaller">Humidity</p>
                 <p
@@ -51,13 +56,14 @@
                     v-text="formatWind(weather.imperial.wind.gust)"
                 />
                 </div>
-            </div>
+            </div> -->
         </div>
   </div>
 </template>
 
 <script>
 var weather = require('openweather-apis')
+var ColorScale = require('color-scales')
 
 const METRIC = 'metric'
 const IMPERIAL = 'imperial'
@@ -79,7 +85,8 @@ export default {
           metric: null,
           imperial: null,
           image: null
-      }
+      },
+      colorScale: null
     }
   },
 
@@ -90,6 +97,7 @@ export default {
 
   mounted() {
     this.configureWeather('metric')
+    this.colorScale = new ColorScale(-5, 35, ["#D01B1B", "#ffffff", "#47abd8"]);
     this.getLatestWeather()
     this.setDataInterval()
   },
@@ -113,7 +121,7 @@ export default {
       weather.setLang('en')
       weather.setCity('Walthamstow')
       weather.setUnits(units)
-      weather.setCoordinate(51.5886338, -0.0353019);
+    //   weather.setCoordinate(51.5886338, -0.0353019);
       weather.setAPPID(process.env.VUE_APP_OPENWEATHER_APP_ID)
     },
     getLatestWeather() {
@@ -126,19 +134,18 @@ export default {
       weather.setUnits(IMPERIAL)
       weather.getAllWeather((err, JSONObj) => {
         self.weather.imperial = JSONObj
-        self.updateTemperatureColor(self.weather.imperial.main.temp)
+        self.updateTemperatureColor(self.weather.metric.main.temp)
       })
-      weather.getWeatherOneCall((err, data) => {
-            console.info('?')
-            console.info(data)
-        });
+    //   weather.getWeatherOneCall((err, data) => {
+    //         console.info('?')
+    //         console.info(data)
+    //     });
       console.info(this.weather)
     },
     temperature(){
         return `${Math.round(this.weather.metric.main.temp)}°C / ${Math.round(this.weather.imperial.main.temp)}°F`
     },
     formatTemperature(temp, unit) {
-        console.info(unit)
         if (unit === 'metric'){
             return `${Math.round(temp)}°C`
         } else {
@@ -150,6 +157,78 @@ export default {
     },
     formatWind(speed) {
         return `${Math.round(speed)}mph`
+    },
+    windDescription(speed) {
+        // https://www.rmets.org/resource/beaufort-scale
+        console.info(speed)
+        if (speed < 1) {
+            return 'calm'
+        }
+        if (speed >= 1 && speed < 4) {
+            return 'light air'
+        }
+        if (speed >= 4 && speed < 8) {
+            return 'a light breeze'
+        }
+        if (speed >= 8 && speed < 13) {
+            return 'a gentle breeze'
+        }
+        if (speed >= 13 && speed < 19) {
+            return 'a moderate breeze'
+        }
+        if (speed >= 19 && speed < 25) {
+            return 'a fresh breeze'
+        }
+        if (speed >= 25 && speed < 32) {
+            return 'a strong breeze'
+        }
+        if (speed >= 32 && speed < 39) {
+            return 'a near gale'
+        }
+        if (speed >= 39 && speed < 47) {
+            return 'a gale'
+        }
+        if (speed >= 47 && speed < 55) {
+            return 'a strong gale'
+        }
+        if (speed >= 55 && speed < 64) {
+            return 'stormy'
+        }
+        if (speed >= 64 && speed < 73) {
+            return 'violently stormy'
+        }
+        if (speed >= 74) {
+            return 'hurricane conditions'
+        }
+        return ``
+    },
+    humidityDescription(humidity) {
+        console.info(humidity)
+        if (humidity >= 0 && humidity < 25) {
+            return 'very dry'
+        }
+        if (humidity >= 25 && humidity < 30) {
+            return 'slightly dry'
+        }
+        if (humidity >= 30 && humidity < 60) {
+            return 'dry'
+        }
+        if (humidity >= 60 && humidity < 70) {
+            return 'slightly humid'
+        }
+        if (humidity >= 70 && humidity < 80) {
+            return 'humid'
+        }
+        if (humidity >= 80) {
+            return 'very humid'
+        }
+        return ``
+    },
+    formatOverview(weather) {
+        var windDescription = this.windDescription(weather.imperial.wind.speed)
+        var humidityDescription = this.humidityDescription(weather.metric.main.humidity)
+        if (weather.imperial.wind.speed)
+        return `${weather.imperial.weather[0].description}, ${humidityDescription} and ${windDescription}`
     },
     isTempFeelDifferent(temperature){
         if (Math.round(temperature.temp) == Math.round(temperature.feels_like)){
@@ -176,11 +255,12 @@ export default {
         return ''
     },
     updateTemperatureColor(temperature) {
-        var hue = 200 + (160 * ( temperature / 100 ));
+        let hexStr = this.colorScale.getColor(temperature).toHexString();
         document.documentElement.style.setProperty(
         '--colour-temperature',
-        `hsl(${hue}, 50%, 50%)`
+        hexStr
       )
+
     }
   },
 
