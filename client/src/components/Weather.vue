@@ -63,7 +63,7 @@
 
 <script>
 var weather = require('openweather-apis')
-var ColorScale = require('color-scales')
+var colorScale = require('color-scales')
 
 const METRIC = 'metric'
 const IMPERIAL = 'imperial'
@@ -86,7 +86,8 @@ export default {
           imperial: null,
           image: null
       },
-      colorScale: null
+      colorScaleLight: null,
+      colorScaleDark: null
     }
   },
 
@@ -97,7 +98,8 @@ export default {
 
   mounted() {
     this.configureWeather('metric')
-    this.colorScale = new ColorScale(-5, 35, ["#D01B1B", "#ffffff", "#47abd8"]);
+    this.colorScaleLight = new colorScale(-5, 35, ["#D01B1B", "#ffffff", "#47abd8"])
+    this.colorScaleDark = new colorScale(-5, 35, ["#D01B1B", "#000000", "#47abd8"])
     this.getLatestWeather()
     this.setDataInterval()
   },
@@ -160,7 +162,6 @@ export default {
     },
     windDescription(speed) {
         // https://www.rmets.org/resource/beaufort-scale
-        console.info(speed)
         if (speed < 1) {
             return 'calm'
         }
@@ -203,7 +204,6 @@ export default {
         return ``
     },
     humidityDescription(humidity) {
-        console.info(humidity)
         if (humidity >= 0 && humidity < 25) {
             return 'very dry'
         }
@@ -255,12 +255,16 @@ export default {
         return ''
     },
     updateTemperatureColor(temperature) {
-        let hexStr = this.colorScale.getColor(temperature).toHexString();
+        let hexStrLight = this.colorScaleLight.getColor(temperature).toHexString()
+        let hexStrDark = this.colorScaleDark.getColor(temperature).toHexString()
         document.documentElement.style.setProperty(
-        '--colour-temperature',
-        hexStr
-      )
-
+            '--color-temperature',
+            hexStrLight
+        )
+        document.documentElement.style.setProperty(
+            '--color-temperature-dark',
+            hexStrDark
+        )
     }
   },
 
