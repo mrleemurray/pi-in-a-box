@@ -132,7 +132,7 @@ export default {
         weather.getAllWeather(function(err, JSONObj){
             // console.info(JSONObj)
             // we need the coords for the openweathermap OneCall API
-            weather.setCoordinate(JSONObj.coord.lon, JSONObj.coord.lat);
+            weather.setCoordinate(JSONObj.coord.lat, JSONObj.coord.lon);
             self.getLatestWeather()
         });
     },
