@@ -48,12 +48,26 @@
     transition: opacity 1s 1s ease-in-out;
   }
 
+  &__details--medium {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 40px;
+    height: 50%;
+    width: 100%;
+    background: var(--color-temperature-dark);
+    transition: opacity 1s 1s ease-in-out;
+  }
+
+  &__summary--medium {
+    display: flex;
+  }
+
   &__overview {
     font-size: 5em;
     font-style: italic;
     line-height: 1.2em;
     margin: 0em 0em 0.2em 0em;
-    
   }
 
   &__temperature {
@@ -66,13 +80,21 @@
     opacity: 1;
     margin: 0em 0em 0.2em 0em;
     transition: opacity 1s 1s ease-in-out;
-    bottom: 0.25em;
+    bottom: 0.25em; 
+  }
+
+  &__temperature--medium {
+    // width: 100%;
+    font-size: 6em;
+    // color: var(--color-temperature-light);
+    // text-align: center;
+    bottom: 0em; 
   }
 
   &__divider {
     opacity: 0.7;
     margin: 0em 0.25em;
-    color: var(--color-temperature);
+    color: var(--colour-temperature);
   }
 
   &__feel {
@@ -106,6 +128,20 @@
     text-overflow: ellipsis;
     overflow: hidden;
     transition: opacity 1s 1s ease-in-out;
+  }
+
+  &__icon--medium {
+    font-size: 10em;
+  }
+
+  &__icons--medium {
+    display: flex;
+    align-items: center;
+  }
+
+  &__icon-wind {
+    font-size: 8em;
+    margin-left: 1em;
   }
 
   &--active {
