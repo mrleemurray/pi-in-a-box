@@ -11,7 +11,7 @@
                 />
             </transition>
         </div>
-        <div class="weather__details" :class="largeDetailOpacity(size)">
+        <div class="weather__details" :class="detailOpacity(size, 'large')">
             <p
                 class="weather__overview"
             >
@@ -24,39 +24,38 @@
                 <span class="weather__divider">/</span>
                 <span v-text="formatTemperature(weather.metric.main.temp, 'metric')"/>
             </p>
-            <!-- <div :class="isTempFeelDifferent(weather.imperial.main)">
-            <p class="weather__description">Feels like</p>
-            <p
-                class="weather__temperature weather__feel"
+        </div>
+        <div class="weather__details--medium" :class="detailOpacity(size, 'medium')">
+            <div class="weather__icons--medium">
+            <i class="wi weather__icon--medium"
+                :class="formatWeatherIcon(weather.metric.weather[0].id)"></i>
+                <i class="wi wi-wind weather__icon--medium weather__icon-wind"
+                :class="formatWindIcon(weather.metric.wind.deg)"
+                ></i>
+            </div>
+                <p
+                class="weather__temperature weather__temperature--medium"
             >
-                <span v-text="formatTemperature(weather.imperial.main.feels_like, 'imperial')"/>
+                <span v-text="formatTemperature(weather.imperial.main.temp, 'imperial')"/>
                 <span class="weather__divider">/</span>
-                <span v-text="formatTemperature(weather.metric.main.feels_like, 'metric')"/>
+                <span v-text="formatTemperature(weather.metric.main.temp, 'metric')"/>
             </p>
-            </div> -->
-            <!-- <div class="weather__extra">
-                <div class="weather__section">
-                <p class="weather__description weather__smaller">Humidity</p>
+        </div>
+        <div class="weather__details--medium" :class="detailOpacity(size, 'small')">
+            <div class="weather__icons--medium">
+            <i class="wi weather__icon--medium"
+                :class="formatWeatherIcon(weather.metric.weather[0].id)"></i>
+                <i class="wi wi-wind weather__icon--medium weather__icon-wind"
+                :class="formatWindIcon(weather.metric.wind.deg)"
+                ></i>
+            </div>
                 <p
-                    class="weather__humidity"
-                    v-text="formatHumidity(weather.metric.main.humidity)"
-                />
-                </div>
-                <div class="weather__section">
-                <p class="weather__description weather__smaller">Wind</p>
-                <p
-                    class="weather__humidity"
-                    v-text="formatWind(weather.imperial.wind.speed)"
-                />
-                </div>
-                <div class="weather__section">
-                <p class="weather__description weather__smaller">Gusts</p>
-                <p
-                    class="weather__humidity"
-                    v-text="formatWind(weather.imperial.wind.gust)"
-                />
-                </div>
-            </div> -->
+                class="weather__temperature weather__temperature--medium"
+            >
+                <span v-text="formatTemperature(weather.imperial.main.temp, 'imperial')"/>
+                <span class="weather__divider">/</span>
+                <span v-text="formatTemperature(weather.metric.main.temp, 'metric')"/>
+            </p>
         </div>
   </div>
 </template>
@@ -68,14 +67,19 @@ var colorScale = require('color-scales')
 const METRIC = 'metric'
 const IMPERIAL = 'imperial'
 
+const LARGE = 'large'
+const MEDIUM = 'medium'
+const SMALL = 'small'
+// const XSMALL = 'xsmall'
+
 export default {
   name: 'Weather',
 
   components: {},
   props: {
       size: {
-          type: Number,
-          default: 0.8
+          type: String,
+          default: MEDIUM
       }
   },
   data() {
@@ -123,7 +127,6 @@ export default {
       weather.setLang('en')
       weather.setCity('Walthamstow')
       weather.setUnits(units)
-    //   weather.setCoordinate(51.5886338, -0.0353019);
       weather.setAPPID(process.env.VUE_APP_OPENWEATHER_APP_ID)
     },
     getLatestWeather() {
@@ -159,6 +162,9 @@ export default {
     },
     formatWind(speed) {
         return `${Math.round(speed)}mph`
+    },
+    formatWindIcon(deg) {
+        return `towards-${deg}-deg`
     },
     windDescription(speed) {
         // https://www.rmets.org/resource/beaufort-scale
@@ -230,6 +236,9 @@ export default {
         if (weather.imperial.wind.speed)
         return `${weather.imperial.weather[0].description}, ${humidityDescription} and ${windDescription}`
     },
+    formatWeatherIcon(id) {
+        return `wi-owm-${id}`
+    },
     isTempFeelDifferent(temperature){
         if (Math.round(temperature.temp) == Math.round(temperature.feels_like)){
             return 'weather--opacity-0'
@@ -237,19 +246,19 @@ export default {
         return ''
     },
     imageOpacity(size) {
-        if (size >= 0.8) {
+        if (size == LARGE) {
             return 'weather--opacity-50'
         }
-        if (size >= 0.5) {
-            return 'weather--opacity-30'
+        if (size == MEDIUM) {
+            return 'weather--opacity-20'
         }
-        if (size >= 0.2) {
+        if (size == SMALL) {
             return 'weather--opacity-10'
         }
         return 'weather--opacity-0'
     },
-    largeDetailOpacity(size) {
-        if (size < 0.8) {
+    detailOpacity(size, validSize) {
+        if (size != validSize) {
             return 'weather--opacity-0'
         }
         return ''
@@ -263,6 +272,10 @@ export default {
         )
         document.documentElement.style.setProperty(
             '--color-temperature-dark',
+            `${hexStrDark}77`
+        )
+        document.documentElement.style.setProperty(
+            '--color-temperature-dark-solid',
             hexStrDark
         )
     }
