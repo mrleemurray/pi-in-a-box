@@ -1,11 +1,11 @@
 <template>
-  <div v-if="(weather.metric !== null) && (weather.imperial !== null)" class="weather">
+  <div v-if="(weather.data !== null)" class="weather">
       <div class="weather__cover">
             <transition name="fade">
                 <img
                 :src="weather.image"
-                :alt="weather.metric.weather[0].description"
-                :key="weather.dt"
+                :alt="weather.data.current.weather[0].description"
+                :key="weather.data.current.dt"
                 class="weather__image"
                 :class="imageOpacity(size)"
                 />
@@ -20,41 +20,41 @@
             <p
                 class="weather__temperature"
             >
-                <span v-text="formatTemperature(weather.imperial.main.temp, 'imperial')"/>
+                <span v-text="formatTemperature(weather.data.current.temp, 'imperial')"/>
                 <span class="weather__divider">/</span>
-                <span v-text="formatTemperature(weather.metric.main.temp, 'metric')"/>
+                <span v-text="formatTemperature(weather.data.current.temp, 'metric')"/>
             </p>
         </div>
         <div class="weather__details--medium" :class="detailOpacity(size, 'medium')">
             <div class="weather__icons--medium">
             <i class="wi weather__icon--medium"
-                :class="formatWeatherIcon(weather.metric.weather[0].id)"></i>
+                :class="formatWeatherIcon(weather.data.current.weather[0].id)"></i>
                 <i class="wi wi-wind weather__icon--medium weather__icon-wind"
-                :class="formatWindIcon(weather.metric.wind.deg)"
+                :class="formatWindIcon(weather.data.current.wind_deg)"
                 ></i>
             </div>
                 <p
                 class="weather__temperature weather__temperature--medium"
             >
-                <span v-text="formatTemperature(weather.imperial.main.temp, 'imperial')"/>
+                <span v-text="formatTemperature(weather.data.current.temp, 'imperial')"/>
                 <span class="weather__divider">/</span>
-                <span v-text="formatTemperature(weather.metric.main.temp, 'metric')"/>
+                <span v-text="formatTemperature(weather.data.current.temp, 'metric')"/>
             </p>
         </div>
         <div class="weather__details--medium" :class="detailOpacity(size, 'small')">
             <div class="weather__icons--medium">
             <i class="wi weather__icon--medium"
-                :class="formatWeatherIcon(weather.metric.weather[0].id)"></i>
+                :class="formatWeatherIcon(weather.data.current.weather[0].id)"></i>
                 <i class="wi wi-wind weather__icon--medium weather__icon-wind"
-                :class="formatWindIcon(weather.metric.wind.deg)"
+                :class="formatWindIcon(weather.data.current.wind_deg)"
                 ></i>
             </div>
                 <p
                 class="weather__temperature weather__temperature--medium"
             >
-                <span v-text="formatTemperature(weather.imperial.main.temp, 'imperial')"/>
+                <span v-text="formatTemperature(weather.data.current.weather[0].main.temp, 'imperial')"/>
                 <span class="weather__divider">/</span>
-                <span v-text="formatTemperature(weather.metric.main.temp, 'metric')"/>
+                <span v-text="formatTemperature(weather.data.current.weather[0].main.temp, 'metric')"/>
             </p>
         </div>
   </div>
@@ -63,9 +63,6 @@
 <script>
 var weather = require('openweather-apis')
 var colorScale = require('color-scales')
-
-const METRIC = 'metric'
-const IMPERIAL = 'imperial'
 
 const LARGE = 'large'
 const MEDIUM = 'medium'
@@ -86,8 +83,7 @@ export default {
     return {
       pollWeather: null,
       weather: {
-          metric: null,
-          imperial: null,
+          data: null,
           image: null
       },
       colorScaleLight: null,
@@ -127,34 +123,43 @@ export default {
       weather.setLang('en')
       weather.setCity('Walthamstow')
       weather.setUnits(units)
+      weather.setExclude("minutely,daily,alerts")
       weather.setAPPID(process.env.VUE_APP_OPENWEATHER_APP_ID)
+      this.getLatLong()
+    },
+    getLatLong() {
+        var self = this;
+        weather.getAllWeather(function(err, JSONObj){
+            // console.info(JSONObj)
+            // we need the coords for the openweathermap OneCall API
+            weather.setCoordinate(JSONObj.coord.lon, JSONObj.coord.lat);
+            self.getLatestWeather()
+        });
     },
     getLatestWeather() {
       var self = this;
-      weather.setUnits(METRIC)
-      weather.getAllWeather((err, JSONObj) => {
-        self.weather.metric = JSONObj
-        self.weather.image = `https://source.unsplash.com/720x720/?${self.weather.metric.weather[0].description.replace(/ /g, ",")}`
-      })
-      weather.setUnits(IMPERIAL)
-      weather.getAllWeather((err, JSONObj) => {
-        self.weather.imperial = JSONObj
-        self.updateTemperatureColor(self.weather.metric.main.temp)
-      })
-    //   weather.getWeatherOneCall((err, data) => {
-    //         console.info('?')
-    //         console.info(data)
-    //     });
-      console.info(this.weather)
+    var coords = weather.getCoordinate()
+    if (coords.latitude != undefined && coords.longitude != undefined) {
+        weather.getWeatherOneCall((err, data) => {
+                console.info(data)
+                self.weather.data = data
+                self.weather.image = `https://source.unsplash.com/720x720/?${self.weather.data.current.weather[0].description.replace(/ /g, ",")}`
+            });
+        console.info(self.weather)
+    }
     },
     temperature(){
         return `${Math.round(this.weather.metric.main.temp)}°C / ${Math.round(this.weather.imperial.main.temp)}°F`
+    },
+    celciusToFarenheit(celsius) 
+    {
+        return celsius * 9 / 5 + 32;
     },
     formatTemperature(temp, unit) {
         if (unit === 'metric'){
             return `${Math.round(temp)}°C`
         } else {
-            return `${Math.round(temp)}°F`
+            return `${Math.round(this.celciusToFarenheit(temp))}°F`
         }
     },
     formatHumidity(humidity) {
@@ -231,10 +236,10 @@ export default {
         return ``
     },
     formatOverview(weather) {
-        var windDescription = this.windDescription(weather.imperial.wind.speed)
-        var humidityDescription = this.humidityDescription(weather.metric.main.humidity)
-        if (weather.imperial.wind.speed)
-        return `${weather.imperial.weather[0].description}, ${humidityDescription} and ${windDescription}`
+        var windDescription = this.windDescription(weather.data.current.wind_speed)
+        var humidityDescription = this.humidityDescription(weather.data.current.humidity)
+        if (weather.data.current.wind_speed)
+        return `${weather.data.current.weather[0].description}, ${humidityDescription} and ${windDescription}`
     },
     formatWeatherIcon(id) {
         return `wi-owm-${id}`
